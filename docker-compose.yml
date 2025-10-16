@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  visual-regression:
+    build: .
+    container_name: visual-regression-tool
+    volumes:
+      - ./config:/app/config:ro
+      - ./baseline:/app/baseline
+      - ./results:/app/results
+      - ./storage:/app/storage
+    environment:
+      - NODE_ENV=production
+      - STORAGE_TYPE=local
+      - STORAGE_PATH=/app/storage
+    networks:
+      - visual-regression-network
+    restart: unless-stopped
+
+  # Optional: MinIO for S3-compatible on-premise storage
+  minio:
+    image: minio/minio:latest
+    container_name: visual-regression-minio
+    volumes:
+      - minio_data:/data
+    environment:
+      - MINIO_ROOT_USER=visualregression
+      - MINIO_ROOT_PASSWORD=your-secure-password-here
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"  # API
+      - "9001:9001"  # Console
+    networks:
+      - visual-regression-network
+    restart: unless-stopped
+
+  # Optional: PostgreSQL for metadata storage
+  postgres:
+    image: postgres:15-alpine
+    container_name: visual-regression-db
+    environment:
+      - POSTGRES_DB=visual_regression
+      - POSTGRES_USER=visualregression
+      - POSTGRES_PASSWORD=your-db-password-here
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "5432:5432"
+    networks:
+      - visual-regression-network
+    restart: unless-stopped
+
+volumes:
+  minio_data:
+  postgres_data:
+
+networks:
+  visual-regression-network:
+    driver: bridge
