@@ -1,0 +1,29 @@
+{
+  "baseUrl": "file:///home/luke/Code/visual-regression",
+  "targets": [
+    {
+      "name": "homepage",
+      "url": "/test-website.html",
+      "selector": "body",
+      "viewport": { "width": 1200, "height": 800 }
+    },
+    {
+      "name": "header",
+      "url": "/test-website.html",
+      "selector": "header",
+      "viewport": { "width": 1200, "height": 200 }
+    },
+    {
+      "name": "mobile-homepage",
+      "url": "/test-website.html",
+      "selector": "body",
+      "viewport": { "width": 375, "height": 667 }
+    }
+  ],
+  "options": {
+    "waitTime": 3000,
+    "threshold": 0.1,
+    "includeAA": false,
+    "diffMask": [255, 0, 255]
+  }
+}
