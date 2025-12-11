@@ -10,6 +10,7 @@ const ScreenshotCapture = require('./src/screenshot-capture');
 const ImageComparator = require('./src/image-comparator');
 const BaselineManager = require('./src/baseline-manager');
 const Reporter = require('./src/reporter');
+const Crawler = require('./src/crawler');
 
 const program = new Command();
 
@@ -36,6 +37,85 @@ program
       console.log(chalk.blue('Edit the configuration file to match your website URLs and targets.'));
     } catch (error) {
       console.error(chalk.red('Error creating configuration:'), error.message);
+      process.exit(1);
+    }
+  });
+
+program
+  .command('crawl')
+  .description('Crawl website to auto-discover targets')
+  .argument('<url>', 'Base URL to crawl')
+  .option('-d, --depth <number>', 'Max depth to crawl', '2')
+  .option('-p, --pages <number>', 'Max pages to find', '20')
+  .option('--selector <selector>', 'CSS selector to target (default: body)')
+  .option('-o, --output <file>', 'Output file for discovered targets (JSON)')
+  .option('-s, --save', 'Save found targets to config file')
+  .action(async (url, options) => {
+    try {
+      console.log(chalk.blue(`Crawling ${url}...`));
+
+      const crawler = new Crawler({
+        maxDepth: parseInt(options.depth),
+        maxPages: parseInt(options.pages),
+        selector: options.selector
+      });
+
+      const targets = await crawler.crawl(url);
+
+      console.log(chalk.green(`\nFound ${targets.length} targets:`));
+      targets.forEach(t => {
+        console.log(chalk.gray(`  - ${t.name}: ${t.url}`));
+      });
+
+      if (options.output) {
+        await fs.ensureDir(path.dirname(options.output));
+        await fs.writeJson(options.output, targets, { spaces: 2 });
+        console.log(chalk.green(`\nSaved targets to ${options.output}`));
+      }
+
+      if (options.save) {
+        const configLoader = new ConfigLoader();
+        const existingConfig = await configLoader.loadConfig();
+
+        // Update config with new targets
+        const newConfig = {
+          ...existingConfig,
+          baseUrl: url,
+          targets: targets
+        };
+
+        await configLoader.saveConfig(newConfig);
+        console.log(chalk.green('\nConfiguration updated with found targets.'));
+      }
+
+    } catch (error) {
+      console.error(chalk.red('Error crawling website:'), error.message);
+      process.exit(1);
+    }
+  });
+
+program
+  .command('ci')
+  .description('Setup CI/CD integration')
+  .option('--gitlab', 'Generate GitLab CI configuration')
+  .action(async (options) => {
+    try {
+      if (options.gitlab) {
+        const templatePath = path.join(__dirname, 'templates', '.gitlab-ci.yml');
+        const destPath = path.join(process.cwd(), '.gitlab-ci.yml');
+
+        if (await fs.pathExists(destPath)) {
+          console.log(chalk.yellow('.gitlab-ci.yml already exists.'));
+          // Could ask to overwrite, but safer to just warn
+        } else {
+          await fs.copy(templatePath, destPath);
+          console.log(chalk.green('Created .gitlab-ci.yml'));
+        }
+      } else {
+        console.log(chalk.yellow('Please specify a CI provider (e.g., --gitlab)'));
+      }
+    } catch (error) {
+      console.error(chalk.red('Error setting up CI:'), error.message);
       process.exit(1);
     }
   });

@@ -41,6 +41,29 @@ class ScreenshotCapture {
       if (target.selector && target.selector !== 'body') {
         await page.waitForSelector(target.selector, { timeout: 10000 });
       }
+
+      // Apply masking/ignoring
+      if (target.ignoreSelectors && Array.isArray(target.ignoreSelectors)) {
+        await page.evaluate((selectors) => {
+          selectors.forEach(selector => {
+            document.querySelectorAll(selector).forEach(el => {
+              el.style.visibility = 'hidden';
+            });
+          });
+        }, target.ignoreSelectors);
+      }
+
+      if (target.maskSelectors && Array.isArray(target.maskSelectors)) {
+        await page.evaluate((selectors) => {
+          selectors.forEach(selector => {
+            document.querySelectorAll(selector).forEach(el => {
+              el.style.backgroundColor = 'magenta';
+              el.style.color = 'transparent';
+              el.style.backgroundImage = 'none';
+            });
+          });
+        }, target.maskSelectors);
+      }
       
       // Capture screenshot of element or full page
       let screenshot;

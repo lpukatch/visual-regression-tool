@@ -73,6 +73,25 @@ node index.js init [--force]
 ```
 - `--force`: Overwrite existing configuration
 
+### `crawl`
+Crawl a website to auto-discover pages and generate configuration.
+```bash
+node index.js crawl <url> [--depth <number>] [--pages <number>] [--selector <selector>] [--save]
+```
+- `<url>`: Base URL to crawl (e.g., http://localhost:3000)
+- `--depth`: Max crawl depth (default: 2)
+- `--pages`: Max pages to find (default: 20)
+- `--selector`: CSS selector to target on each page (default: body)
+- `--output`: Output file for discovered targets (JSON)
+- `--save`: Save found targets to config/visual-regression.config.json
+
+### `ci`
+Setup CI/CD integration.
+```bash
+node index.js ci --gitlab
+```
+- `--gitlab`: Generate a .gitlab-ci.yml file
+
 ### `baseline`
 Set baseline screenshots for comparison.
 ```bash
@@ -116,6 +135,8 @@ Array of targets to test. Each target can have:
 - `url`: URL path relative to baseUrl
 - `selector`: CSS selector to capture (e.g., `body`, `#main`, `.header`)
 - `viewport`: Object with `width` and `height` for browser viewport
+- `ignoreSelectors`: Array of CSS selectors to hide (visibility: hidden)
+- `maskSelectors`: Array of CSS selectors to mask with solid color
 
 ### options
 Comparison and capture options:
