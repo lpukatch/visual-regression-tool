@@ -75,6 +75,18 @@ class Crawler {
           const page = await this.browser.newPage();
           await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
 
+          // Verify selector exists if not body
+          let shouldAdd = true;
+          if (this.defaultSelector !== 'body') {
+            const element = await page.$(this.defaultSelector);
+            if (!element) {
+              shouldAdd = false;
+              // Remove the target we optimistically added
+              this.targets.pop();
+              console.log(`Skipping ${url} (selector "${this.defaultSelector}" not found)`);
+            }
+          }
+
           const hrefs = await page.$$eval('a', as => as.map(a => a.href));
           await page.close();
 

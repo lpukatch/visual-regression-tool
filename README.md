@@ -82,6 +82,7 @@ node index.js crawl <url> [--depth <number>] [--pages <number>] [--selector <sel
 - `--depth`: Max crawl depth (default: 2)
 - `--pages`: Max pages to find (default: 20)
 - `--selector`: CSS selector to target on each page (default: body)
+- `--output`: Output file for discovered targets (JSON)
 - `--save`: Save found targets to config/visual-regression.config.json
 
 ### `ci`

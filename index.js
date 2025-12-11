@@ -48,6 +48,7 @@ program
   .option('-d, --depth <number>', 'Max depth to crawl', '2')
   .option('-p, --pages <number>', 'Max pages to find', '20')
   .option('--selector <selector>', 'CSS selector to target (default: body)')
+  .option('-o, --output <file>', 'Output file for discovered targets (JSON)')
   .option('-s, --save', 'Save found targets to config file')
   .action(async (url, options) => {
     try {
@@ -65,6 +66,12 @@ program
       targets.forEach(t => {
         console.log(chalk.gray(`  - ${t.name}: ${t.url}`));
       });
+
+      if (options.output) {
+        await fs.ensureDir(path.dirname(options.output));
+        await fs.writeJson(options.output, targets, { spaces: 2 });
+        console.log(chalk.green(`\nSaved targets to ${options.output}`));
+      }
 
       if (options.save) {
         const configLoader = new ConfigLoader();
