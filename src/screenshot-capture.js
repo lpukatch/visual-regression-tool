@@ -92,21 +92,51 @@ class ScreenshotCapture {
 
   async captureMultiple(config, targets, outputDir) {
     const results = [];
+    const concurrency = 5; // Default concurrency limit
+    const queue = [...targets];
     
-    for (const target of targets) {
-      const filename = `${target.name}.png`;
-      const outputPath = path.join(outputDir, filename);
-      
-      try {
-        const result = await this.captureScreenshot(config, target, outputPath);
-        results.push({ target, path: result, success: true });
-      } catch (error) {
-        console.error(`Failed to capture ${target.name}:`, error.message);
-        results.push({ target, error: error.message, success: false });
+    // Worker function to process items from the queue
+    const worker = async () => {
+      while (queue.length > 0) {
+        // Shift is safe here because JS is single-threaded (no race condition on array mutation)
+        // However, we need to ensure we don't start processing undefined if queue became empty
+        // between check and shift (though in this loop structure it's fine).
+        const target = queue.shift();
+        if (!target) break;
+
+        const filename = `${target.name}.png`;
+        const outputPath = path.join(outputDir, filename);
+
+        try {
+          const result = await this.captureScreenshot(config, target, outputPath);
+          results.push({ target, path: result, success: true });
+        } catch (error) {
+          console.error(`Failed to capture ${target.name}:`, error.message);
+          results.push({ target, error: error.message, success: false });
+        }
       }
+    };
+
+    // Create worker promises
+    const workers = [];
+    // If targets are fewer than concurrency, only spawn needed workers
+    const workerCount = Math.min(concurrency, targets.length);
+
+    for (let i = 0; i < workerCount; i++) {
+      workers.push(worker());
     }
     
-    return results;
+    await Promise.all(workers);
+
+    // Restore original order in results if needed (though not strictly required by contract, it's nice)
+    // The current implementation appends to results as they finish, so order is not guaranteed.
+    // If order matters, we should map back to original targets.
+    // The original implementation returned results in order.
+    // Let's sort results to match targets order
+    const resultsMap = new Map(results.map(r => [r.target.name, r]));
+    const orderedResults = targets.map(t => resultsMap.get(t.name)).filter(Boolean);
+
+    return orderedResults;
   }
 }
 
