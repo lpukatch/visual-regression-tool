@@ -1,0 +1,162 @@
+[
+  {
+    "FilePath": "../docker-compose.yml",
+    "FileType": ".yml",
+    "SizeBytes": 1515,
+    "Issues": [],
+    "Metadata": {}
+  },
+  {
+    "FilePath": "../discovered.json",
+    "FileType": ".json",
+    "SizeBytes": 3,
+    "Issues": [],
+    "Metadata": {}
+  },
+  {
+    "FilePath": "../package-lock.json",
+    "FileType": ".json",
+    "SizeBytes": 43976,
+    "Issues": [],
+    "Metadata": {}
+  },
+  {
+    "FilePath": "../README.md",
+    "FileType": ".md",
+    "SizeBytes": 6701,
+    "Issues": [],
+    "Metadata": {}
+  },
+  {
+    "FilePath": "../test-website.html",
+    "FileType": ".html",
+    "SizeBytes": 5888,
+    "Issues": [
+      "Missing meta description"
+    ],
+    "Metadata": {
+      "Title": "Test Website for Visual Regression"
+    }
+  },
+  {
+    "FilePath": "../package.json",
+    "FileType": ".json",
+    "SizeBytes": 435,
+    "Issues": [],
+    "Metadata": {}
+  },
+  {
+    "FilePath": "../.gitignore",
+    "FileType": ".gitignore",
+    "SizeBytes": 394,
+    "Issues": [],
+    "Metadata": {}
+  },
+  {
+    "FilePath": "../Dockerfile",
+    "FileType": "",
+    "SizeBytes": 784,
+    "Issues": [
+      "Unknown file type (no extension)"
+    ],
+    "Metadata": {}
+  },
+  {
+    "FilePath": "../STORAGE.md",
+    "FileType": ".md",
+    "SizeBytes": 5713,
+    "Issues": [],
+    "Metadata": {}
+  },
+  {
+    "FilePath": "../index.js",
+    "FileType": ".js",
+    "SizeBytes": 10769,
+    "Issues": [],
+    "Metadata": {}
+  },
+  {
+    "FilePath": "../DEPLOYMENT.md",
+    "FileType": ".md",
+    "SizeBytes": 6465,
+    "Issues": [],
+    "Metadata": {}
+  },
+  {
+    "FilePath": "../config/visual-regression.config.json",
+    "FileType": ".json",
+    "SizeBytes": 656,
+    "Issues": [],
+    "Metadata": {}
+  },
+  {
+    "FilePath": "../templates/.gitlab-ci.yml",
+    "FileType": ".yml",
+    "SizeBytes": 919,
+    "Issues": [],
+    "Metadata": {}
+  },
+  {
+    "FilePath": "../src/config-loader.js",
+    "FileType": ".js",
+    "SizeBytes": 3522,
+    "Issues": [],
+    "Metadata": {}
+  },
+  {
+    "FilePath": "../src/baseline-manager.js",
+    "FileType": ".js",
+    "SizeBytes": 3233,
+    "Issues": [],
+    "Metadata": {}
+  },
+  {
+    "FilePath": "../src/image-comparator.js",
+    "FileType": ".js",
+    "SizeBytes": 3426,
+    "Issues": [],
+    "Metadata": {}
+  },
+  {
+    "FilePath": "../src/reporter.js",
+    "FileType": ".js",
+    "SizeBytes": 12894,
+    "Issues": [],
+    "Metadata": {}
+  },
+  {
+    "FilePath": "../src/crawler.js",
+    "FileType": ".js",
+    "SizeBytes": 3400,
+    "Issues": [],
+    "Metadata": {}
+  },
+  {
+    "FilePath": "../src/screenshot-capture.js",
+    "FileType": ".js",
+    "SizeBytes": 3400,
+    "Issues": [],
+    "Metadata": {}
+  },
+  {
+    "FilePath": "../baseline/mobile-homepage.png",
+    "FileType": ".png",
+    "SizeBytes": 202694,
+    "Issues": [],
+    "Metadata": {}
+  },
+  {
+    "FilePath": "../baseline/homepage.png",
+    "FileType": ".png",
+    "SizeBytes": 183329,
+    "Issues": [],
+    "Metadata": {}
+  },
+  {
+    "FilePath": "../baseline/header.png",
+    "FileType": ".png",
+    "SizeBytes": 11114,
+    "Issues": [],
+    "Metadata": {}
+  }
+]
