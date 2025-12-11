@@ -47,6 +47,7 @@ program
   .argument('<url>', 'Base URL to crawl')
   .option('-d, --depth <number>', 'Max depth to crawl', '2')
   .option('-p, --pages <number>', 'Max pages to find', '20')
+  .option('--selector <selector>', 'CSS selector to target (default: body)')
   .option('-s, --save', 'Save found targets to config file')
   .action(async (url, options) => {
     try {
@@ -54,7 +55,8 @@ program
 
       const crawler = new Crawler({
         maxDepth: parseInt(options.depth),
-        maxPages: parseInt(options.pages)
+        maxPages: parseInt(options.pages),
+        selector: options.selector
       });
 
       const targets = await crawler.crawl(url);

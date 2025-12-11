@@ -5,6 +5,7 @@ class Crawler {
   constructor(options = {}) {
     this.maxDepth = options.maxDepth || 2;
     this.maxPages = options.maxPages || 20;
+    this.defaultSelector = options.selector || 'body';
     this.visited = new Set();
     this.queue = [];
     this.targets = [];
@@ -62,7 +63,7 @@ class Crawler {
         this.targets.push({
           name: name,
           url: relativePath,
-          selector: 'body',
+          selector: this.defaultSelector,
           viewport: { width: 1200, height: 800 }
         });
 

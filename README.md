@@ -76,11 +76,12 @@ node index.js init [--force]
 ### `crawl`
 Crawl a website to auto-discover pages and generate configuration.
 ```bash
-node index.js crawl <url> [--depth <number>] [--pages <number>] [--save]
+node index.js crawl <url> [--depth <number>] [--pages <number>] [--selector <selector>] [--save]
 ```
 - `<url>`: Base URL to crawl (e.g., http://localhost:3000)
 - `--depth`: Max crawl depth (default: 2)
 - `--pages`: Max pages to find (default: 20)
+- `--selector`: CSS selector to target on each page (default: body)
 - `--save`: Save found targets to config/visual-regression.config.json
 
 ### `ci`
