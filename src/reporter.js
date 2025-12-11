@@ -105,7 +105,7 @@ class Reporter {
     html += '        .total { color: #007bff; }\n';
     html += '        .results { padding: 30px; }\n';
     html += '        .result-item { border: 1px solid #e9ecef; border-radius: 8px; margin-bottom: 20px; overflow: hidden; }\n';
-    html += '        .result-header { padding: 15px 20px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }\n';
+    html += '        .result-header { padding: 15px 20px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }\n';
     html += '        .result-header.passed { background: #d4edda; color: #155724; }\n';
     html += '        .result-header.failed { background: #f8d7da; color: #721c24; }\n';
     html += '        .result-content { padding: 20px; background: white; }\n';
@@ -114,7 +114,22 @@ class Reporter {
     html += '        .detail-label { font-weight: bold; color: #495057; margin-bottom: 5px; }\n';
     html += '        .detail-value { color: #6c757d; }\n';
     html += '        .error-message { background: #f8d7da; color: #721c24; padding: 15px; border-radius: 4px; border: 1px solid #f5c6cb; }\n';
+    html += '        .image-comparison { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px; }\n';
+    html += '        .image-container { border: 1px solid #dee2e6; border-radius: 4px; padding: 10px; text-align: center; }\n';
+    html += '        .image-container img { max-width: 100%; height: auto; border: 1px solid #eee; }\n';
+    html += '        .image-title { font-weight: bold; margin-bottom: 10px; color: #495057; }\n';
+    html += '        .hidden { display: none; }\n';
     html += '    </style>\n';
+    html += '    <script>\n';
+    html += '        function toggleContent(id) {\n';
+    html += '            const content = document.getElementById(id);\n';
+    html += '            if (content.classList.contains("hidden")) {\n';
+    html += '                content.classList.remove("hidden");\n';
+    html += '            } else {\n';
+    html += '                content.classList.add("hidden");\n';
+    html += '            }\n';
+    html += '        }\n';
+    html += '    </script>\n';
     html += '</head>\n<body>\n';
     html += '    <div class="container">\n';
     html += '        <div class="header">\n';
@@ -151,13 +166,14 @@ class Reporter {
   generateResultHtml(result) {
     const status = result.passed === false || result.success === false ? 'failed' : 'passed';
     const statusText = status === 'passed' ? '✓ PASSED' : '✗ FAILED';
+    const contentId = 'content-' + Math.random().toString(36).substr(2, 9);
     
     let html = '<div class="result-item">\n';
-    html += '    <div class="result-header ' + status + '">\n';
+    html += '    <div class="result-header ' + status + '" onclick="toggleContent(\'' + contentId + '\')">\n';
     html += '        <span>' + result.target.name + '</span>\n';
-    html += '        <span>' + statusText + '</span>\n';
+    html += '        <span>' + statusText + ' (Click to toggle)</span>\n';
     html += '    </div>\n';
-    html += '    <div class="result-content">\n';
+    html += '    <div id="' + contentId + '" class="result-content ' + (status === 'passed' ? 'hidden' : '') + '">\n';
     
     if (result.error) {
       html += '        <div class="error-message"><strong>Error:</strong> ' + result.error + '</div>\n';
@@ -198,6 +214,49 @@ class Reporter {
     }
 
     html += '        </div>\n';
+
+    // Add Images
+    if (result.hasBaseline) {
+        html += '        <div class="image-comparison">\n';
+
+        // Calculate relative paths
+        // Assuming report is in results/report.html and images are in results/current-X/ or baseline/
+
+        let baselineRelPath = '';
+        if (result.baselinePath) {
+             baselineRelPath = path.relative(path.join(process.cwd(), 'results'), result.baselinePath);
+        }
+
+        let currentRelPath = '';
+        if (result.currentPath) {
+             currentRelPath = path.relative(path.join(process.cwd(), 'results'), result.currentPath);
+        }
+
+        let diffRelPath = '';
+        if (result.diffPath) {
+             diffRelPath = path.relative(path.join(process.cwd(), 'results'), result.diffPath);
+        }
+
+        html += '            <div class="image-container">\n';
+        html += '                <div class="image-title">Baseline</div>\n';
+        html += '                <img src="' + baselineRelPath + '" alt="Baseline">\n';
+        html += '            </div>\n';
+
+        html += '            <div class="image-container">\n';
+        html += '                <div class="image-title">Current</div>\n';
+        html += '                <img src="' + currentRelPath + '" alt="Current">\n';
+        html += '            </div>\n';
+
+        if (result.diffPath) {
+            html += '            <div class="image-container">\n';
+            html += '                <div class="image-title">Diff</div>\n';
+            html += '                <img src="' + diffRelPath + '" alt="Diff">\n';
+            html += '            </div>\n';
+        }
+
+        html += '        </div>\n';
+    }
+
     return html;
   }
 

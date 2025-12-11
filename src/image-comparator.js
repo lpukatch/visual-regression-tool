@@ -97,6 +97,8 @@ class ImageComparator {
           target,
           success: true,
           hasBaseline: true,
+          baselinePath,
+          currentPath,
           ...comparison
         });
       } catch (error) {

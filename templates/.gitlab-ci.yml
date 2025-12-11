@@ -1,0 +1,45 @@
+image: node:18
+
+stages:
+  - baseline
+  - test
+
+variables:
+  # Cache node modules
+  npm_config_cache: "$CI_PROJECT_DIR/.npm"
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - .npm
+    - node_modules
+
+before_script:
+  # Install dependencies
+  - npm ci
+  # Install puppeteer dependencies if needed
+  - apt-get update && apt-get install -y wget gnupg ca-certificates procps libxss1 libasound2 libatk-bridge2.0-0 libgtk-3-0 libnss3 libx11-xcb1
+
+baseline:
+  stage: baseline
+  script:
+    - node index.js baseline
+  # Only run manually or on specific conditions to avoid overwriting baseline on every run
+  when: manual
+  artifacts:
+    paths:
+      - baseline/
+    expire_in: 1 week
+
+visual_test:
+  stage: test
+  script:
+    - node index.js test --html
+  artifacts:
+    when: always
+    paths:
+      - results/
+      - baseline/
+    reports:
+      junit: results/junit.xml # If you add junit reporter
+  allow_failure: true
