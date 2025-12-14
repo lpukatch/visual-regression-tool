@@ -62,56 +62,74 @@ class ImageComparator {
 
   async compareMultiple(baselineDir, currentDir, diffDir, targets) {
     const results = [];
+    const concurrency = 5;
+    const queue = [...targets];
 
-    for (const target of targets) {
-      const baselinePath = path.join(baselineDir, `${target.name}.png`);
-      const currentPath = path.join(currentDir, `${target.name}.png`);
-      const diffPath = path.join(diffDir, `${target.name}-diff.png`);
+    const worker = async () => {
+      while (queue.length > 0) {
+        const target = queue.shift();
+        if (!target) break;
 
-      try {
-        // Check if baseline exists
-        if (!(await fs.pathExists(baselinePath))) {
+        const baselinePath = path.join(baselineDir, `${target.name}.png`);
+        const currentPath = path.join(currentDir, `${target.name}.png`);
+        const diffPath = path.join(diffDir, `${target.name}-diff.png`);
+
+        try {
+          // Check if baseline exists
+          if (!(await fs.pathExists(baselinePath))) {
+            results.push({
+              target,
+              success: false,
+              error: 'Baseline image not found',
+              hasBaseline: false
+            });
+            continue;
+          }
+
+          // Check if current image exists
+          if (!(await fs.pathExists(currentPath))) {
+            results.push({
+              target,
+              success: false,
+              error: 'Current image not found',
+              hasBaseline: true
+            });
+            continue;
+          }
+
+          const comparison = await this.compareImages(baselinePath, currentPath, diffPath);
+
+          results.push({
+            target,
+            success: true,
+            hasBaseline: true,
+            baselinePath,
+            currentPath,
+            ...comparison
+          });
+        } catch (error) {
           results.push({
             target,
             success: false,
-            error: 'Baseline image not found',
-            hasBaseline: false
+            error: error.message,
+            hasBaseline: await fs.pathExists(baselinePath)
           });
-          continue;
         }
-
-        // Check if current image exists
-        if (!(await fs.pathExists(currentPath))) {
-          results.push({
-            target,
-            success: false,
-            error: 'Current image not found',
-            hasBaseline: true
-          });
-          continue;
-        }
-
-        const comparison = await this.compareImages(baselinePath, currentPath, diffPath);
-        
-        results.push({
-          target,
-          success: true,
-          hasBaseline: true,
-          baselinePath,
-          currentPath,
-          ...comparison
-        });
-      } catch (error) {
-        results.push({
-          target,
-          success: false,
-          error: error.message,
-          hasBaseline: await fs.pathExists(baselinePath)
-        });
       }
+    };
+
+    const workers = [];
+    const workerCount = Math.min(concurrency, targets.length);
+
+    for (let i = 0; i < workerCount; i++) {
+      workers.push(worker());
     }
 
-    return results;
+    await Promise.all(workers);
+
+    // Sort results to match input order
+    const resultsMap = new Map(results.map(r => [r.target.name, r]));
+    return targets.map(t => resultsMap.get(t.name)).filter(Boolean);
   }
 }
 
